@@ -35,7 +35,10 @@ fun TaskFormScreen(
             Spacer(Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Button(onClick = { draftViewModel.saveDraft(title, description); onBack() }) { Text("Save as Draft") }
-                Button(onClick = { taskViewModel.createTask(title, description) }) { Text("Publish") }
+                Button(
+                    onClick = { taskViewModel.createTask(title, description) },
+                    enabled = title.isNotBlank()
+                ) { Text("Publish") }
             }
         }
     }
