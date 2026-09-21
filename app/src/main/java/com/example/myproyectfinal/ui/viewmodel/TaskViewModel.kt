@@ -26,7 +26,7 @@ class TaskViewModel @Inject constructor(
     val uiState: StateFlow<TaskListUiState> = getCurrentUserUseCase()
         .flatMapLatest { user ->
             if (user == null) flowOf(TaskListUiState())
-            else getTasksUseCase(user.id).map { TaskListUiState(tasks = it) }
+            else getTasksUseCase(user.id).map { TaskListUiState(tasks = it, userEmail = user.email) }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TaskListUiState(isLoading = true))
 

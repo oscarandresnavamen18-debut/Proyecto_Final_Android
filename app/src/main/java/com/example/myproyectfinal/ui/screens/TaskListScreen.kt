@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myproyectfinal.domain.model.Task
 import com.example.myproyectfinal.ui.state.OperationState
@@ -89,6 +90,16 @@ fun TaskListScreen(
             }
         } else {
             LazyColumn(modifier = Modifier.padding(padding)) {
+                item {
+                    uiState.userEmail?.let { email ->
+                        Text(
+                            text = "Welcome, $email",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
                 items(uiState.tasks) { task ->
                     TaskItem(
                         task = task,
@@ -103,10 +114,23 @@ fun TaskListScreen(
 
 @Composable
 fun TaskItem(task: Task, onToggle: () -> Unit, onDelete: () -> Unit) {
-    ListItem(
-        headlineContent = { Text(task.title) },
-        supportingContent = { Text(task.description) },
-        leadingContent = { Checkbox(checked = task.isCompleted, onCheckedChange = { onToggle() }) },
-        trailingContent = { IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Delete") } }
-    )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        ListItem(
+            headlineContent = { 
+                Text(
+                    text = task.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    textDecoration = if (task.isCompleted) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
+                ) 
+            },
+            supportingContent = { Text(task.description) },
+            leadingContent = { Checkbox(checked = task.isCompleted, onCheckedChange = { onToggle() }) },
+            trailingContent = { IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Delete") } }
+        )
+    }
 }

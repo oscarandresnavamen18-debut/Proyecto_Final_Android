@@ -5,6 +5,7 @@ import com.example.myproyectfinal.domain.model.TaskDraft
 
 data class TaskListUiState(
     val tasks: List<Task> = emptyList(),
+    val userEmail: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )
