@@ -21,18 +21,49 @@ fun DraftsScreen(
     viewModel: DraftViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showDeleteAllDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteAllDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteAllDialog = false },
+            title = { Text("Delete All Drafts") },
+            text = { Text("Are you sure you want to delete all drafts? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteAllDrafts()
+                    showDeleteAllDialog = false
+                }) { Text("Delete All") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteAllDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Drafts") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+                actions = {
+                    if (uiState.drafts.isNotEmpty()) {
+                        IconButton(onClick = { showDeleteAllDialog = true }) {
+                            Icon(Icons.Default.Delete, "Delete All")
+                        }
+                    }
+                }
             )
         }
     ) { padding ->
-        LazyColumn(Modifier.padding(padding)) {
-            items(uiState.drafts) { draft ->
-                DraftItem(draft, onPublish = { viewModel.publishDraft(draft.id) }, onDelete = { viewModel.deleteDraft(draft.id) })
+        if (uiState.drafts.isEmpty()) {
+            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                Text("No drafts found.")
+            }
+        } else {
+            LazyColumn(Modifier.padding(padding)) {
+                items(uiState.drafts) { draft ->
+                    DraftItem(draft, onPublish = { viewModel.publishDraft(draft.id) }, onDelete = { viewModel.deleteDraft(draft.id) })
+                }
             }
         }
     }
