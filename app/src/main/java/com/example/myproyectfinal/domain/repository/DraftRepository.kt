@@ -9,4 +9,5 @@ interface DraftRepository {
     suspend fun updateDraft(draft: TaskDraft)
     suspend fun deleteDraft(id: Int)
     suspend fun getDraftById(id: Int): TaskDraft?
+    suspend fun deleteAllDrafts()
 }

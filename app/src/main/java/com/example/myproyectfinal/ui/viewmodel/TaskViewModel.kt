@@ -49,7 +49,13 @@ class TaskViewModel @Inject constructor(
 
     fun deleteTask(taskId: String) {
         viewModelScope.launch {
-            deleteTaskUseCase(taskId)
+            _operationState.value = OperationState.Loading
+            val result = deleteTaskUseCase(taskId)
+            _operationState.value = if (result.isSuccess) OperationState.Success("Task deleted") else OperationState.Error("Error deleting task")
         }
+    }
+
+    fun resetOperationState() {
+        _operationState.value = OperationState.Idle
     }
 }

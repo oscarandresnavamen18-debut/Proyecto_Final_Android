@@ -20,4 +20,7 @@ interface TaskDraftDao {
 
     @Query("SELECT * FROM task_drafts WHERE id = :id")
     suspend fun getDraftById(id: Int): TaskDraftEntity?
+
+    @Query("DELETE FROM task_drafts")
+    suspend fun deleteAllDrafts()
 }

@@ -23,6 +23,10 @@ class DeleteDraftUseCase @Inject constructor(private val repository: DraftReposi
     suspend operator fun invoke(id: Int) = repository.deleteDraft(id)
 }
 
+class DeleteAllDraftsUseCase @Inject constructor(private val repository: DraftRepository) {
+    suspend operator fun invoke() = repository.deleteAllDrafts()
+}
+
 class PublishDraftUseCase @Inject constructor(
     private val draftRepository: DraftRepository,
     private val taskRepository: TaskRepository

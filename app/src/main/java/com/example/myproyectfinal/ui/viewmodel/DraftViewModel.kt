@@ -16,6 +16,7 @@ class DraftViewModel @Inject constructor(
     private val getDraftsUseCase: GetDraftsUseCase,
     private val saveDraftUseCase: SaveDraftUseCase,
     private val deleteDraftUseCase: DeleteDraftUseCase,
+    private val deleteAllDraftsUseCase: DeleteAllDraftsUseCase,
     private val publishDraftUseCase: PublishDraftUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase
 ) : ViewModel() {
@@ -47,6 +48,12 @@ class DraftViewModel @Inject constructor(
     fun deleteDraft(id: Int) {
         viewModelScope.launch {
             deleteDraftUseCase(id)
+        }
+    }
+
+    fun deleteAllDrafts() {
+        viewModelScope.launch {
+            deleteAllDraftsUseCase()
         }
     }
 }

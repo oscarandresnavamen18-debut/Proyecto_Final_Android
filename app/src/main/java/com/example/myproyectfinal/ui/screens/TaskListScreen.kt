@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myproyectfinal.domain.model.Task
+import com.example.myproyectfinal.ui.state.OperationState
 import com.example.myproyectfinal.ui.viewmodel.TaskViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,6 +25,42 @@ fun TaskListScreen(
     viewModel: TaskViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val opState by viewModel.operationState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(opState) {
+        when (opState) {
+            is OperationState.Success -> {
+                (opState as OperationState.Success).message?.let {
+                    snackbarHostState.showSnackbar(it)
+                    viewModel.resetOperationState()
+                }
+            }
+            is OperationState.Error -> {
+                snackbarHostState.showSnackbar((opState as OperationState.Error).message)
+                viewModel.resetOperationState()
+            }
+            else -> {}
+        }
+    }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text("Logout") },
+            text = { Text("Are you sure you want to log out?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showLogoutDialog = false
+                    onLogout()
+                }) { Text("Logout") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -31,10 +68,11 @@ fun TaskListScreen(
                 title = { Text("Tasks") },
                 actions = {
                     IconButton(onClick = onViewDrafts) { Icon(Icons.AutoMirrored.Filled.List, contentDescription = "Drafts") }
-                    IconButton(onClick = onLogout) { Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout") }
+                    IconButton(onClick = { showLogoutDialog = true }) { Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Logout") }
                 }
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddTask) {
                 Icon(Icons.Default.Add, contentDescription = "Add Task")
@@ -44,6 +82,10 @@ fun TaskListScreen(
         if (uiState.isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
                 CircularProgressIndicator()
+            }
+        } else if (uiState.tasks.isEmpty()) {
+            Box(Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                Text("No tasks found. Tap + to add one!")
             }
         } else {
             LazyColumn(modifier = Modifier.padding(padding)) {

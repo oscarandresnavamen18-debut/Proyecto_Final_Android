@@ -22,4 +22,6 @@ class DraftRepositoryImpl @Inject constructor(
     override suspend fun deleteDraft(id: Int) = dao.deleteDraft(id)
 
     override suspend fun getDraftById(id: Int): TaskDraft? = dao.getDraftById(id)?.toDomain()
+
+    override suspend fun deleteAllDrafts() = dao.deleteAllDrafts()
 }
